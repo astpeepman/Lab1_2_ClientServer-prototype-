@@ -2,7 +2,7 @@
 
 enum Addresses {
 	A_BROCKER = 0,
-	A_ALL = -1
+	A_ALL = 100
 };
 
 enum Messages {

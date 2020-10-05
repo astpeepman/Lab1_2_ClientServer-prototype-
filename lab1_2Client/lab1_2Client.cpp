@@ -52,7 +52,7 @@ void getData() {
             cout << "Want to connect to a server again? (0/1)" << endl;
         }
             
-        
+        Sleep(1000);
     }
 }
 
@@ -108,7 +108,13 @@ void start() {
                     cin.ignore();
                     getline(cin, str);
                     canalStart(client);
-                    Message::SendMessage(client, ID, ClientId, M_TEXT, str);
+                    if (ID == 100) {
+                        Message::SendMessage(client, A_ALL, ClientId, M_TEXT, str);
+                    }
+                    else {
+                        Message::SendMessage(client, ID, ClientId, M_TEXT, str);
+                    }
+                    
                     h_message = m.Receive(client);
                     canalStop(client);
                     hMutex.lock();

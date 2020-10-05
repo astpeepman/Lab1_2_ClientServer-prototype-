@@ -20,7 +20,7 @@
 
 CWinApp theApp;
 
-int gMaxID = 0;
+int gMaxID = 100;
 map<int, shared_ptr<Session>> gSessions;
 
 vector<int> freeIDs;
@@ -43,13 +43,12 @@ void TimeOut() {
             if (gSessions.find(i) != gSessions.end())
             {
                 double  workTime = clock() - gSessions[i]->getTime();
-                if (workTime > 50000)
+                if (workTime > 10000)
                 {
                     cout << "Client " << i << " has been disconnected due to long inactivity" << endl;
                     gSessions[i]->setConnect(false);
-
-                    
-                    
+                    gSessions.erase(i);
+                    freeIDs.push_back(i);
 
                 }
             }
@@ -93,16 +92,9 @@ void ProcessClient(SOCKET hSock) {
         }
         case M_GETDATA: {
             if (gSessions.find(m.getM_Header().m_From) != gSessions.end()) {
-                if (gSessions[m.getM_Header().m_From]->getConnect() == false) {
-                    Message::SendMessage(s, m.getM_Header().m_From, A_BROCKER, M_EXIT1);
-                    gSessions.erase(m.getM_Header().m_From);
-                    freeIDs.push_back(m.getM_Header().m_From);
 
-
-                }
-                else {
-                    gSessions[m.getM_Header().m_From]->Send(s, clock());
-                }
+                gSessions[m.getM_Header().m_From]->setTime(clock());
+                gSessions[m.getM_Header().m_From]->Send(s);
                 
             }
             break;
@@ -116,13 +108,24 @@ void ProcessClient(SOCKET hSock) {
                 }
                 else if (m.getM_Header().m_To == A_ALL)
                 {
-                    cout << m.getM_Data() << endl;
-                    for (int id = 0; id < gSessions.size(); id++)
+                    
+                    for (const auto& i : gSessions) {
+                        if (i.first != m.getM_Header().m_From) {
+                            i.second->Add(m);
+                        }
+                    }
+
+                   /* for (auto it = gSessions.begin(); it != gSessions.end(); ++it) {
+                        if (it->first != m.getM_Header().m_From) {
+                            it->second->Add(m);
+                        }
+                    }*/
+                    /*for (int id = A_ALL+1; id < gSessions.size()+A_ALL+1; id++)
                     {
                         if (id != m.getM_Header().m_From) {
                             gSessions[id]->Add(m);
                         }
-                    }
+                    }*/
                 }
                 Message::SendMessage(s, m.getM_Header().m_From, A_BROCKER, M_CONFIRM);
                 gSessions[m.getM_Header().m_From]->setTime(clock());

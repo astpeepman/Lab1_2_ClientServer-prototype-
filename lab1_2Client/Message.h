@@ -2,7 +2,7 @@
 
 enum Addresses {
 	A_BROCKER = 0,
-	A_ALL = -1
+	A_ALL = 100
 };
 
 enum Messages {
@@ -17,10 +17,10 @@ enum Messages {
 
 struct MsgHeader
 {
-	int m_To;
-	int m_From;
-	int m_Type;
-	int m_Size;
+	unsigned int m_To;
+	unsigned int m_From;
+	unsigned int m_Type;
+	unsigned int m_Size;
 };
 
 class Message {
@@ -48,7 +48,7 @@ public:
 	Message() {
 		m_header = { 0 };
 	}
-	Message(int to, int from, int type = M_TEXT, const string& data = "") :m_data(data) {
+	Message(unsigned int to, unsigned int from, unsigned int type = M_TEXT, const string& data = "") :m_data(data) {
 		m_header.m_To = to;
 		m_header.m_From = from;
 		m_header.m_Type = type;
@@ -74,7 +74,7 @@ public:
 		return m_header;
 	}
 
-	static void SendMessage(CSocket& s, int To, int From, int Type = M_TEXT, const string& Data = "")
+	static void SendMessage(CSocket& s, unsigned int To, unsigned int From, unsigned int Type = M_TEXT, const string& Data = "")
 	{
 		Message msg(To, From, Type, Data);
 		msg.Send(s);

@@ -11,7 +11,9 @@ private:
 public:
 
 	void setConnect(bool c) {
+		EnterCriticalSection(&m_CS);
 		connect = c;
+		LeaveCriticalSection(&m_CS);
 	}
 
 	bool getConnect() {
@@ -23,7 +25,9 @@ public:
 	}
 
 	void setTime(clock_t t) {
+		EnterCriticalSection(&m_CS);
 		time = t;
+		LeaveCriticalSection(&m_CS);
 	}
 
 	int getM_ID() {
@@ -58,7 +62,7 @@ public:
 		m_messages.push(msg);
 		LeaveCriticalSection(&m_CS);
 	}
-	void Send(CSocket& s, clock_t t)
+	void Send(CSocket& s)
 	{
 		EnterCriticalSection(&m_CS);
 		if (m_messages.empty())
@@ -69,7 +73,6 @@ public:
 		{
 			m_messages.front().Send(s);
 			m_messages.pop();
-			time = t;
 		}
 		LeaveCriticalSection(&m_CS);
 	}
